@@ -19,6 +19,19 @@ const (
 	enter  byte = 13
 )
 
+const (
+	CSI          = "\033["
+	ColorBlack   = "30"
+	ColorRed     = "31"
+	ColorGreen   = "32"
+	ColorYellow  = "33"
+	ColorBlue    = "34"
+	ColorMagenta = "35"
+	ColorCyan    = "36"
+	ColorWhite   = "37"
+	ColorDefault = "39"
+)
+
 type Menu struct {
 	Prompt    string
 	CursorPos int
@@ -40,13 +53,17 @@ func NewMenu(prompt string) *Menu {
 }
 
 func (m *Menu) Render() {
+	setColor(ColorCyan)
 	fmt.Println(m.Prompt, ": ")
+	setColor("")
 	for i, menuItem := range m.Items {
 		prefix := " "
 		if i == m.CursorPos {
 			prefix = ">"
+			setColor(ColorYellow)
 		}
 		fmt.Println(prefix, menuItem.Label)
+		setColor("")
 	}
 	moveCursorUp(len(m.Items) + 1)
 }
@@ -75,6 +92,15 @@ func (m *Menu) Load() string {
 			}
 		}
 		m.Render()
+	}
+}
+
+func setColor(code string) {
+	switch code {
+	case ColorYellow, ColorGreen, ColorBlack, ColorBlue, ColorCyan, ColorMagenta, ColorRed:
+		fmt.Printf("%v%vm", CSI, code)
+	default:
+		fmt.Printf("%v%vm", CSI, ColorDefault)
 	}
 }
 
