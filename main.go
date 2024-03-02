@@ -21,15 +21,15 @@ const (
 
 const (
 	CSI          = "\033["
-	ColorBlack   = "30"
-	ColorRed     = "31"
-	ColorGreen   = "32"
-	ColorYellow  = "33"
-	ColorBlue    = "34"
-	ColorMagenta = "35"
-	ColorCyan    = "36"
-	ColorWhite   = "37"
-	ColorDefault = "39"
+	ColorBlack   = "30m"
+	ColorRed     = "31m"
+	ColorGreen   = "32m"
+	ColorYellow  = "33m"
+	ColorBlue    = "34m"
+	ColorMagenta = "35m"
+	ColorCyan    = "36m"
+	ColorWhite   = "37m"
+	ColorDefault = "39m"
 )
 
 type Menu struct {
@@ -54,8 +54,9 @@ func NewMenu(prompt string) *Menu {
 
 func (m *Menu) Render() {
 	setColor(ColorCyan)
-	fmt.Println(m.Prompt, ": ")
-	setColor("")
+	setBold()
+	fmt.Print(m.Prompt, ": \n")
+	clearTextStyle()
 	for i, menuItem := range m.Items {
 		prefix := " "
 		if i == m.CursorPos {
@@ -98,22 +99,31 @@ func (m *Menu) Load() string {
 func setColor(code string) {
 	switch code {
 	case ColorYellow, ColorGreen, ColorBlack, ColorBlue, ColorCyan, ColorMagenta, ColorRed:
-		fmt.Printf("%v%vm", CSI, code)
+		fmt.Printf("%v%v", CSI, code)
 	default:
-		fmt.Printf("%v%vm", CSI, ColorDefault)
+		fmt.Printf("%v%v", CSI, ColorDefault)
 	}
 }
 
+func setBold() {
+	fmt.Printf("%v1m", CSI)
+}
+
+func clearTextStyle() {
+	setColor("")
+	fmt.Printf("%v0m", CSI)
+}
+
 func moveCursorUp(n int) {
-	fmt.Printf("\033[%dA", n)
+	fmt.Printf("%v%dA", CSI, n)
 }
 
 func cursorOn() {
-	fmt.Printf("\033[?25h")
+	fmt.Printf("%v?25h", CSI)
 }
 
 func cursorOff() {
-	fmt.Printf("\033[?25l")
+	fmt.Printf("%v?25l", CSI)
 }
 func getInput() byte {
 	t, _ := term.Open("/dev/tty")
@@ -135,13 +145,17 @@ func getInput() byte {
 	return readBytes[0]
 }
 
+var menuItems []*MenuItem = []*MenuItem{
+	{Label: "First", ID: "1st"},
+	{Label: "Second", ID: "2nd"},
+	{Label: "Third", ID: "3rd"},
+	{Label: "Fours", ID: "4rs"},
+	{Label: "Fifs", ID: "5fs"},
+}
+
 func main() {
 	m := NewMenu("General")
-	m.Items = append(m.Items, &MenuItem{Label: "First", ID: "1st"})
-	m.Items = append(m.Items, &MenuItem{Label: "Second", ID: "2nd"})
-	m.Items = append(m.Items, &MenuItem{Label: "Third", ID: "3rd"})
-	m.Items = append(m.Items, &MenuItem{Label: "Fours", ID: "4rs"})
-	m.Items = append(m.Items, &MenuItem{Label: "Fifs", ID: "5fs"})
+	m.Items = menuItems
 	sel := m.Load()
 	if sel != "" {
 		fmt.Println("Selected menu id =", sel)
