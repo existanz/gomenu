@@ -40,6 +40,7 @@ func NewMenu(prompt string) *Menu {
 }
 
 func (m *Menu) Render() {
+	fmt.Println(m.Prompt, ": ")
 	for i, menuItem := range m.Items {
 		prefix := " "
 		if i == m.CursorPos {
@@ -94,8 +95,17 @@ func main() {
 	for ch != escape {
 		ch = getInput()
 		if ch == up || ch == kUp || ch == wUp {
-			moveCursorUp(1)
+			m.CursorPos--
+			if m.CursorPos < 0 {
+				m.CursorPos = 0
+			}
+		} else if ch == down || ch == jDown || ch == sDown {
+			m.CursorPos++
+			if m.CursorPos >= len(m.Items) {
+				m.CursorPos = len(m.Items) - 1
+			}
 		}
-		fmt.Println("Choice:", ch)
+		moveCursorUp(len(m.Items) + 1)
+		m.Render()
 	}
 }
