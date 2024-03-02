@@ -48,6 +48,34 @@ func (m *Menu) Render() {
 		}
 		fmt.Println(prefix, menuItem.Label)
 	}
+	moveCursorUp(len(m.Items) + 1)
+}
+
+func (m *Menu) Load() string {
+	m.Render()
+	cursorOff()
+	defer cursorOn()
+	var key byte = 0
+	for {
+		key = getInput()
+		switch key {
+		case enter:
+			return m.Items[m.CursorPos].ID
+		case escape:
+			return ""
+		case up, kUp, wUp:
+			m.CursorPos--
+			if m.CursorPos < 0 {
+				m.CursorPos = 0
+			}
+		case down, jDown, sDown:
+			m.CursorPos++
+			if m.CursorPos >= len(m.Items) {
+				m.CursorPos = len(m.Items) - 1
+			}
+		}
+		m.Render()
+	}
 }
 
 func moveCursorUp(n int) {
@@ -88,24 +116,8 @@ func main() {
 	m.Items = append(m.Items, &MenuItem{Label: "Third", ID: "3rd"})
 	m.Items = append(m.Items, &MenuItem{Label: "Fours", ID: "4rs"})
 	m.Items = append(m.Items, &MenuItem{Label: "Fifs", ID: "5fs"})
-	m.Render()
-	cursorOff()
-	defer cursorOn()
-	var ch byte = 0
-	for ch != escape {
-		ch = getInput()
-		if ch == up || ch == kUp || ch == wUp {
-			m.CursorPos--
-			if m.CursorPos < 0 {
-				m.CursorPos = 0
-			}
-		} else if ch == down || ch == jDown || ch == sDown {
-			m.CursorPos++
-			if m.CursorPos >= len(m.Items) {
-				m.CursorPos = len(m.Items) - 1
-			}
-		}
-		moveCursorUp(len(m.Items) + 1)
-		m.Render()
+	sel := m.Load()
+	if sel != "" {
+		fmt.Println("Selected menu id =", sel)
 	}
 }
