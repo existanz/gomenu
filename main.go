@@ -24,7 +24,7 @@ type Menu struct {
 type MenuItem struct {
 	Label      string
 	ID         string
-	Selectable bool
+	Unpickable bool
 	SubMenu    *Menu
 }
 
@@ -41,13 +41,19 @@ func (m *Menu) Render() {
 	fmt.Print(m.Prompt, ": \n")
 	clearTextStyle()
 	for i, menuItem := range m.Items {
-		prefix := " "
-		if i == m.CursorPos {
-			prefix = ">"
-			setColor(ColorYellow)
+		if menuItem.Unpickable {
+			setColor(ColorCyan)
+			fmt.Println(menuItem.Label)
+			clearTextStyle()
+		} else {
+			prefix := " "
+			if i == m.CursorPos {
+				prefix = ">"
+				setColor(ColorYellow)
+			}
+			fmt.Println(prefix, menuItem.Label)
+			setColor("")
 		}
-		fmt.Println(prefix, menuItem.Label)
-		setColor("")
 	}
 	moveCursorUp(len(m.Items) + 1)
 }
@@ -69,10 +75,16 @@ func (m *Menu) Load() string {
 			if m.CursorPos < 0 {
 				m.CursorPos = 0
 			}
+			if m.Items[m.CursorPos].Unpickable {
+				m.CursorPos--
+			}
 		case down, jDown, sDown:
 			m.CursorPos++
 			if m.CursorPos >= len(m.Items) {
 				m.CursorPos = len(m.Items) - 1
+			}
+			if m.Items[m.CursorPos].Unpickable {
+				m.CursorPos++
 			}
 		}
 		m.Render()
@@ -82,6 +94,7 @@ func (m *Menu) Load() string {
 var menuItems []*MenuItem = []*MenuItem{
 	{Label: "First", ID: "1st"},
 	{Label: "Second", ID: "2nd"},
+	{Label: "-----------", Unpickable: true},
 	{Label: "Third", ID: "3rd"},
 	{Label: "Fours", ID: "4rs"},
 	{Label: "Fifs", ID: "5fs"},
