@@ -16,9 +16,11 @@ const (
 )
 
 type Menu struct {
-	Prompt    string
-	CursorPos int
-	Items     []*MenuItem
+	Prompt         string
+	CursorPos      int
+	Items          []*MenuItem
+	PrimaryColor   string
+	SecondaryColor string
 }
 
 type MenuItem struct {
@@ -30,26 +32,56 @@ type MenuItem struct {
 
 func NewMenu(prompt string) *Menu {
 	return &Menu{
-		Prompt: prompt,
-		Items:  make([]*MenuItem, 0),
+		Prompt:         prompt,
+		Items:          make([]*MenuItem, 0),
+		PrimaryColor:   ColorCyan,
+		SecondaryColor: ColorYellow,
 	}
 }
 
+func (m *Menu) Up() {
+	m.CursorPos--
+	if m.CursorPos < 0 {
+		m.CursorPos = 0
+	}
+	for m.CursorPos > 0 && m.Items[m.CursorPos].Unpickable {
+		m.CursorPos--
+	}
+	if m.Items[m.CursorPos].Unpickable {
+		m.Down()
+	}
+	m.Render()
+}
+
+func (m *Menu) Down() {
+	m.CursorPos++
+	if m.CursorPos >= len(m.Items) {
+		m.CursorPos = len(m.Items) - 1
+	}
+	for m.CursorPos < len(m.Items)-1 && m.Items[m.CursorPos].Unpickable {
+		m.CursorPos++
+	}
+	if m.Items[m.CursorPos].Unpickable {
+		m.Up()
+	}
+	m.Render()
+}
+
 func (m *Menu) Render() {
-	setColor(ColorCyan)
+	setColor(m.PrimaryColor)
 	setBold()
 	fmt.Print(m.Prompt, ": \n")
 	clearTextStyle()
 	for i, menuItem := range m.Items {
 		if menuItem.Unpickable {
-			setColor(ColorCyan)
+			setColor(m.PrimaryColor)
 			fmt.Println(menuItem.Label)
 			clearTextStyle()
 		} else {
 			prefix := " "
 			if i == m.CursorPos {
 				prefix = ">"
-				setColor(ColorYellow)
+				setColor(m.SecondaryColor)
 			}
 			fmt.Println(prefix, menuItem.Label)
 			setColor("")
@@ -71,21 +103,9 @@ func (m *Menu) Load() string {
 		case escape:
 			return ""
 		case up, kUp, wUp:
-			m.CursorPos--
-			if m.CursorPos < 0 {
-				m.CursorPos = 0
-			}
-			if m.Items[m.CursorPos].Unpickable {
-				m.CursorPos--
-			}
+			m.Up()
 		case down, jDown, sDown:
-			m.CursorPos++
-			if m.CursorPos >= len(m.Items) {
-				m.CursorPos = len(m.Items) - 1
-			}
-			if m.Items[m.CursorPos].Unpickable {
-				m.CursorPos++
-			}
+			m.Down()
 		}
 		m.Render()
 	}
@@ -98,6 +118,7 @@ var menuItems []*MenuItem = []*MenuItem{
 	{Label: "Third", ID: "3rd"},
 	{Label: "Fours", ID: "4rs"},
 	{Label: "Fifs", ID: "5fs"},
+	{Label: "-----------", Unpickable: true},
 }
 
 func main() {
