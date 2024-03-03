@@ -1,4 +1,4 @@
-package main
+package gomenu
 
 import (
 	"fmt"
@@ -108,24 +108,5 @@ func (m *Menu) Load() string {
 			m.Down()
 		}
 		m.Render()
-	}
-}
-
-var menuItems []*MenuItem = []*MenuItem{
-	{Label: "First", ID: "1st"},
-	{Label: "Second", ID: "2nd"},
-	{Label: "-----------", Unpickable: true},
-	{Label: "Third", ID: "3rd"},
-	{Label: "Fours", ID: "4rs"},
-	{Label: "Fifs", ID: "5fs"},
-	{Label: "-----------", Unpickable: true},
-}
-
-func main() {
-	m := NewMenu("General")
-	m.Items = menuItems
-	sel := m.Load()
-	if sel != "" {
-		fmt.Println("Selected menu id =", sel)
 	}
 }
