@@ -99,7 +99,11 @@ func (m *Menu) Load() string {
 		key = getInput()
 		switch key {
 		case enter:
-			return m.Items[m.CursorPos].ID
+			curItem := m.Items[m.CursorPos]
+			if curItem.SubMenu != nil {
+				return curItem.SubMenu.Load()
+			}
+			return curItem.ID
 		case escape:
 			return ""
 		case up, kUp, wUp:
