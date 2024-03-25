@@ -1,4 +1,4 @@
-module gomenu
+module github.com/existanz/gomenu
 
 go 1.22.0
 

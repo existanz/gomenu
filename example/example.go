@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"gomenu"
+	"github/existanz/gomenu"
 )
 
 var sub1mis []*gomenu.MenuItem = []*gomenu.MenuItem{
