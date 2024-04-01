@@ -37,6 +37,14 @@ func clearTextStyle() {
 	fmt.Printf("%v0m", CSI)
 }
 
+func clearLine() {
+	fmt.Printf("%v2K", CSI)
+}
+
+func clearScreen() {
+	fmt.Printf("%vJ", CSI)
+}
+
 func moveCursorUp(n int) {
 	fmt.Printf("%v%dA", CSI, n)
 }

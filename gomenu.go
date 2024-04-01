@@ -68,11 +68,13 @@ func (m *Menu) Down() {
 }
 
 func (m *Menu) Render() {
+	clearLine()
 	setColor(m.PrimaryColor)
 	setBold()
 	fmt.Print(m.Prompt, ": \n")
 	clearTextStyle()
 	for i, menuItem := range m.Items {
+		clearLine()
 		if menuItem.Unpickable {
 			setColor(m.PrimaryColor)
 			fmt.Println(menuItem.Label)
@@ -101,6 +103,7 @@ func (m *Menu) Load() string {
 		case enter:
 			curItem := m.Items[m.CursorPos]
 			if curItem.SubMenu != nil {
+				clearScreen()
 				return curItem.SubMenu.Load()
 			}
 			return curItem.ID
