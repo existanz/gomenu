@@ -44,6 +44,48 @@ func NewMenu(prompt string) *Menu {
 	}
 }
 
+// AddItem adds a new menu item to the menu.
+// To add unpickable items, use AddUnpickableItem instead.
+//
+// id - MenuItem Id.
+// label - MenuItem Label.
+//
+// No return values.
+func (m *Menu) AddItem(id, label string) {
+	m.Items = append(m.Items, &MenuItem{
+		Label: label,
+		ID:    id,
+	})
+}
+
+// AddUnpickableItem adds a new unpickable menu item to the menu.
+//
+// id - MenuItem Id.
+// label - MenuItem Label.
+//
+// No return values.
+func (m *Menu) AddUnpickableItem(id, label string) {
+	m.Items = append(m.Items, &MenuItem{
+		Label:      label,
+		ID:         id,
+		Unpickable: true,
+	})
+}
+
+// GetMenuItem returns the menu item with the given id.
+//
+// id - The id of the menu item to return.
+//
+// Returns a pointer to the menu item, or nil if the item is not found.
+func (m *Menu) GetMenuItem(id string) *MenuItem {
+	for _, item := range m.Items {
+		if item.ID == id {
+			return item
+		}
+	}
+	return nil
+}
+
 // Load displays the menu and waits for user input to navigate and select an item.
 //
 // No parameters.
