@@ -1,4 +1,5 @@
-## This is cli menu for go programs
+# Gomenu
+Cli menu for go programs
 
 ### Usage:
 import "github.com/existanz/gomenu"  
